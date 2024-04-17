@@ -20,10 +20,13 @@ int main()
 	int seguir_ejecutandose = 1;
 	// Arreglo de argumentos
 	char *args[MAX_ARGUMENTS];
+	char *cara = ":)";
+	// Creamos el estado que devolvera el hijo 
+	int status;
 
 	//Bucle principal del programa
 	while(seguir_ejecutandose) {
-		printf("Introduzca un comando: ");
+		printf("%s", cara);
 		getline(&buf, &n, stdin);
 
 		// Cambiando el \n por un \0
@@ -35,6 +38,12 @@ int main()
 		if(SonIguales(buf, "exit") || SonIguales(buf, "exit()")) {
 			// Ponemos el valor de seguir_ejecutandose a 0
 			seguir_ejecutandose = 0;
+			continue;
+		}
+
+		// Comprobar que se introduce clear por terminal
+		if(SonIguales(buf, "clear")) {
+			printf("\033[2J\033[H");
 			continue;
 		}
 
@@ -67,11 +76,21 @@ int main()
 			strcat(temp, args[0]);
 			args[0] = temp;
 
-			execve(args[0], args, NULL);
-			exit(1); //Salir si execve falla
+			int resultado = execve(args[0], args, NULL);
+
+			// Si no se puede ejecutar el comando
+			if (resultado == -1) {
+				perror("El comando no se puede ejecutar");
+				exit(1); //Salir si execve falla
+			}
 		} else {
 			// Proceso padre
-			wait(NULL); // Espera a que termine el hijo
+			wait(&status); // Espera a que termine el hijo
+			if(WEXITSTATUS(status) == 1) {
+				cara = ":(";
+			} else {
+				cara = ":)";
+			}
 		}
 	}
 	free(buf);

@@ -788,3 +788,49 @@ int main()
 	return 0;
 }
 ```
+
+## Añadiendo experiencia de usuario
+
+En esta parte vamos a actualizar el código para poder mejorar la experiencia de usuario donde tenemos que controlar si al ejecutar el código este falla en el cursor aparecerá estos caracteres ":(", si se ejecuta correctamente entonces aparecería ":)". Este sería el codigo que le añadimos a la versión 0.0.1
+
+- Código
+
+```{c, eval=FALSE}
+char *cara = ":)";
+// Creamos el estado que devolvera el hijo 
+int status;
+int resultado = execve(args[0], args, NULL);
+
+			// Si no se puede ejecutar el comando
+			if (resultado == -1) {
+				perror("El comando no se puede ejecutar");
+				exit(1); //Salir si execve falla
+			}
+		} else {
+			// Proceso padre
+			wait(&status); // Espera a que termine el hijo
+			if(WEXITSTATUS(status) == 1) {
+				cara = ":(";
+			} else {
+				cara = ":)";
+			}
+```
+
+En este caso controlamos la salida que produce el hijo en caso de que este devuleva el codigo 1 entonces cambiara la variable de cara a ":(" si no se devuelve el error 1 la cara tendrá los caracteres ":)"
+
+- Ejecución
+
+
+![Terminal](imagenes/Captura desde 2024-04-17 15-15-21.png){width=100%}
+
+# Requisitos opcionales
+
+## Cálculo del tiempo que tarda en ejecutarse el hijo
+
+## Cambio del directorio con cd
+
+## Ejecución asincrona con &
+
+
+
+
