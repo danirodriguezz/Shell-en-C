@@ -335,13 +335,15 @@ int main() {
 ![Terminal](imagenes/Captura desde 2024-04-16 23-37-35.png){width=80%}
 
 \newpage
+
 # Desarrollo de la Shell
 
 Una vez tenido en cuenta los conocimientos de las funciones que hemos repasado en este PDF podemos ponernos a actualizar el diagrama de flujo y empezar a desarrollar nuestra propia shell.
 
+
 ## Diagrama de Flujo Actualizado
 
-
+![Terminal](imagenes/Diagrama de Flujo trabajo.drawio (1).png){width=67%}
 
 \newpage
 
