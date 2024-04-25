@@ -5,6 +5,8 @@
 #include <sys/types.h> // para poder usar pid_t
 #include <unistd.h> // Necesario para declarar el fork()
 #include <sys/wait.h> // Para poder usar el wait()
+#include <pwd.h> // para usar el struct passwd
+#include <errno.h> // para usar una variable errno
 
 #define MAX_ARGUMENTS 40
 
@@ -14,7 +16,6 @@ int SonIguales(const char *str1, const char *str2) {
 
 int main()
 {
-
 	// Tamaño inicial del buffer
 	size_t n = 10;
 	char *buf = malloc(sizeof(char) * n);
@@ -49,6 +50,34 @@ int main()
 			continue;
 		}
 
+		// Dividimos la entrada del usuario por tokens
+		char *token = strtok(buf, " ");
+		int i = 0;
+		while(token != NULL) {
+			args[i++] = token;
+			token = strtok(NULL, " ");
+		}
+		args[i] = NULL;
+
+		// Implementamos el comando cd
+		if(SonIguales(args[0], "cd")){
+			struct passwd *pwd;
+			char* path = args[1];
+			if(path == NULL) {
+				pwd = getpwuid(getuid());
+				path = pwd->pw_dir;
+			}
+			errno = chdir(path);
+			if (errno != 0){
+				printf("No existe ese directorio o hubo un error\n");
+				cara = ":(";
+			} else {
+				printf("Se cambió al directorio %s\n", path);
+				cara = ":)";
+			}
+			continue;
+		}
+
 		// Creamos un proceso hijo
 		pid_t pid;
 		
@@ -67,14 +96,6 @@ int main()
 			printf("PID del proceso hijo %d\n", getpid());
 			printf("PID del proceso padre es %d\n", getppid());
 
-			// Dividimos la entrada del usuario por tokens
-			char *token = strtok(buf, " ");
-			int i = 0;
-			while(token != NULL) {
-				args[i++] = token;
-				token = strtok(NULL, " ");
-			}
-			args[i] = NULL;
 			execvp(args[0], args);
 			exit(1); //Salir si execve falla
 		} else {
