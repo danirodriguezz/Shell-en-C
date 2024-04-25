@@ -1,6 +1,6 @@
 ---
 title: "Crear Un Shell en C"
-author: "Daniel Rodríguez Alonso"
+author: "Daniel Rodríguez, Sofía Travieso García, Jaime Rivero Santana"
 date: "`r format(Sys.Date(), '%d %B %Y')`"
 output: 
   pdf_document: 
@@ -16,9 +16,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 \newpage
 
+#Introducción
+Un "shell" es una interfaz de usuario que permite la interacción con un sistema operativo a través de comandos. En este caso, vamos a desarrollar un shell sencillo en C que pueda ejecutar comandos básicos del sistema operativo.
+
+- **Sofía Travieso García**: se encargó del desarrollo del código general y del apartado opcional"calcular el tiempo que tarda en ejecutarse el proceso hijo". Además, se encargó de realizar la última versión del documento.
+
+- **Daniel Rodríguez Alonso**: se encargó del desarrollo del código general y de la creación del cursor ":) / :(" del código. Además, elaboró la primera versión del documento.
+
+- **Jaime Rivero Santana** se encargó del desarrollo del código general y del apartado opcional "cambiar el directorio con cd".
+
 # Flujo de Ejecución
 
-Para el desarrollo de este shell tenemos que tener en cuenta el flujo de ejecución de nuestro programa, que será el siguiente
+Para el desarrollo de este shell tenemos que tener en cuenta el flujo de ejecución de nuestro programa, que será el siguiente:
 
 ![Diagrama de Flujo](imagenes/Diagrama de Flujo trabajo.drawio.png){width=50%}
 
@@ -26,9 +35,9 @@ Para el desarrollo de este shell tenemos que tener en cuenta el flujo de ejecuci
 
 ## Process ID (PID)
 
-El PID es una abreviatura del process ID, osea del ID del proceso o **identificador del procesos**. El identificador de procesos es un numero entero usado por el Kernel de algunos sistemas operativos(Como el de **Unix** o el de **Windows NT**) para identificar un proceso de forma unívoca.
+El PID es una abreviatura del process ID, es decir, del ID del proceso o **identificador del procesos**. El identificador de procesos es un número entero usado por el Kernel de algunos sistemas operativos (como el de **Unix** o el de **Windows NT**) para identificar un proceso de forma unívoca.
 
-Mostramos un codigo ejemplo para que se vea como se obtiene el PID en C.
+Mostramos un código ejemplo para que se vea como se obtiene el PID en C:
 
 ```{c, eval=FALSE}
 #include <stdio.h>
@@ -51,19 +60,19 @@ int main()
 }
 ```
 
-Este es un pequeño código que imprime una suma de dos numeros y el PID del programa
+Este es un pequeño código que imprime una suma de dos números y el PID del programa.
 
 - Ejecución
 
 ![Terminal](imagenes/Captura desde 2024-04-15 17-55-01.png){width=100%}
 
-En cada ejecucion cambia el PID que es definido por el sistema operativo.
+En cada ejecución cambia el PID que es definido por el sistema operativo.
 
 ## Procesos Padres
 
-Los procesos padres son simplemente los procesos que crean procesos hijos, cada proceso hijo tiene un PID unico que va cambiando cada vez que se ejecuta.
+Los procesos padres son simplemente los procesos que crean procesos hijos. Cada proceso hijo tiene un PID único que va cambiando cada vez que se ejecuta.
 
-En este ejemplo obtengo el proceso padre con getppid() y podemos ver como este no cambia ya que es el proceso padre del bash de la "terminal", entonces significa que la terminal crea un proceso hijo que es nuestro programa y se le asigna un PID pero su proceso padre sigue siendo el mismo.
+En este ejemplo obtengo el proceso padre con getppid() y podemos ver como este no cambia ya que es el proceso padre del bash de la "terminal". Entonces, significa que la terminal crea un proceso hijo que es nuestro programa y se le asigna un PID, pero su proceso padre sigue siendo el mismo.
 
 - Código
 
@@ -92,11 +101,11 @@ int main()
 
 ![Terminal](imagenes/Captura desde 2024-04-15 18-34-27.png){width=100%}
 
-Como vemos da igual cuantas veces ejecutemos el programa por que este tiene el mismo PID padre que es 11909 y que con el comando ps -l vemos que es el pid del bash de la terminal.
+Como vemos, da igual cuantas veces ejecutemos el programa porque este tiene el mismo PID padre que es 11909 y que con el comando ps -l vemos que es el pid del bash de la terminal.
 
 ## Fork
 
-La llamada al sistema fork() se usa para crear procesos hijos que estos son copias de los procesos padres pero con algunas exepciones, y no coge argumentos. Esto es muy necesario para la creación de nuestra propia shell ya que tenemos ser capaces de crear procesos Hijos que estos van a ser la ejecución de los parámetros que le pasemos.
+La llamada al sistema fork() se usa para crear procesos hijos que son copias de los procesos padres pero con algunas exepciones, y no coge argumentos. Esto es muy necesario para la creación de nuestra propia shell, ya que tenemos ser capaces de crear procesos hijos que van a ser la ejecución de los parámetros que le pasemos.
 
 - Valores de retorno de fork()
 
@@ -134,9 +143,9 @@ int main(void)
 
 ![Terminal](imagenes/Captura desde 2024-04-15 19-07-59.png){width=100%}
 
-Cuando ejecutamos el programa se puede ver como primero se ejecuta el mensaje antes de crear el proceso hijo entonces se crea el proceso hijo y ejecuta el segundo mensaje, cuando termina vuelve al proceso padre y ejecuta el segundo mensaje de nuevo por que el padre no lo había ejecutado aún.
+Cuando ejecutamos el programa, se puede ver como primero se ejecuta el mensaje antes de crear el proceso hijo. Entonces, se crea el proceso hijo y ejecuta el segundo mensaje. Cuando termina, vuelve al proceso padre y ejecuta el segundo mensaje de nuevo porque el padre no lo había ejecutado aún.
 
-Si el proceso padre termina antes que el proceso hijo este se queda como un proceso zombie ya no tiene referecia al proceso padre
+Si el proceso padre termina antes que el proceso hijo, este se queda como un proceso zombie y ya no tiene referecia al proceso padre.
 
 ```{c, eval=FALSE}
 #include <stdio.h>
@@ -168,7 +177,7 @@ int main(void)
 
 ## Wait
 
-La llamada a wait() bloquea la llamada a un proceso hasta que uno de los procesos hijos termina. Despues de que el proceso hijo termina, el padre continua ejecutando despues de la instrucción wait.
+La llamada a wait() bloquea la llamada a un proceso hasta que uno de los procesos hijos termina. Después de que el proceso hijo termina, el padre continua ejecutando después de la instrucción wait().
 
 - Código
 
@@ -242,11 +251,11 @@ int main()
 
 ![Terminal](imagenes/Captura desde 2024-04-16 12-21-48.png){width=80%}
 
-El programa ejecuta la instrucción que se le pasa por el vector de caracteres con los ejecutables binarios que se encuentran en el directorio /bin y como vemos no se ejecuta el print("Se ejecutó execve") por que se sobrescribe la instrucción ls.
+El programa ejecuta la instrucción que se le pasa por el vector de caracteres con los ejecutables binarios que se encuentran en el directorio /bin y ,como vemos, no se ejecuta el print("Se ejecutó execve") porque se sobrescribe la instrucción ls.
 
 ## Getline
 
-La función `getline()` se utiliza para leer una linea de texto desde la entrada estandar y la almacena en un buffer esta función nor hará falta para el desarollo de la parte de leer las instrucciones que se pasan por teclado, creamos un código para que se pueda ver la ejecución de esta función.
+La función `getline()` se utiliza para leer una línea de texto desde la entrada estándar y la almacena en un buffer. Esta función no hará falta para el desarollo de leer las instrucciones que se pasan por teclado. Creamos un código para que se pueda ver la ejecución de esta función:
 
 ```{c, eval=FALSE}
 #include <stdio.h>
@@ -338,12 +347,12 @@ int main() {
 
 # Desarrollo de la Shell
 
-Una vez tenido en cuenta los conocimientos de las funciones que hemos repasado en este PDF podemos ponernos a actualizar el diagrama de flujo y empezar a desarrollar nuestra propia shell.
-
+Una vez tenido en cuenta los conocimientos de las funciones que hemos repasado en este PDF, podemos ponernos a actualizar el diagrama de flujo y empezar a desarrollar nuestra propia shell.
 
 ## Diagrama de Flujo Actualizado
 
 ![Terminal](imagenes/Diagrama de Flujo trabajo.drawio (1).png){width=67%}
+
 
 \newpage
 
@@ -387,7 +396,7 @@ int main()
 
 ![Terminal](imagenes/Captura desde 2024-04-17 00-09-25.png){width=80%}
 
-Vemos que el programa no nos dio ningún problema al ser compilado pero no esta funcionando como queremos ya que tenemos el problema que cuando introducimos algo por teclado, la línea que introducimos incluye el salto de linea `\n` y cuando lo comparo con la string "exit" o "exit()" me devuleve que no son iguales.
+Vemos que el programa no nos dio ningún problema al ser compilado, pero no esta funcionando como queremos. Tenemos el problema de que cuando introducimos algo por teclado, la línea que introducimos incluye el salto de linea `\n` y, cuando lo comparo con la string "exit" o "exit()", devuleve que no son iguales.
 
 - Solución
 
@@ -439,7 +448,7 @@ int main()
 
 ## Creando proceso hijo y dividiendo entrada
 
-Una vez que somos capaces de obtener de teclado varias intrucciones de teclado que introduzca el ususario y daber cuando quiere terminar de ejecutar el shell podemos empezar a crear un proceso hijo que va a ser el que ejecute las instrucciones y podemos dividir la entrada del teclado por espacios.
+Una vez que somos capaces de obtener de teclado varias intrucciones que introduzca el ususario y saber cuando quiere terminar de ejecutar el shell, podemos empezar a crear un proceso hijo que va a ser el que ejecute las instrucciones. Adsemás, tendremos que dividir la entrada del teclado por espacios.
 
 - Código
 
@@ -529,11 +538,11 @@ int main()
 
 ![Terminal](imagenes/Captura desde 2024-04-17 12-41-51.png){width=100%}
 
-Vemos como el programa funciona como esperamos ya que nos deja introducir los comandos por pantalla y cuando damos enter nos imprime correctamente el PID del padre y el PID del hijo con la instruccion separada.
+Vemos como el programa funciona como esperamos ya que nos deja introducir los comandos por pantalla y cuando damos "enter" nos imprime correctamente el PID del padre y el PID del hijo con la instruccion separada.
 
 ## Ejecutando los comandos
 
-Ahora vamos a utilizar la función execve que hemos visto en este PDF para poder ejecutar los comandos que sean introducidos por terminal.
+Ahora, vamos a utilizar la función execve que hemos visto en este PDF para poder ejecutar los comandos que sean introducidos por terminal.
 
 - Código
 
@@ -615,7 +624,7 @@ int main()
 
 ![Terminal](imagenes/Captura desde 2024-04-17 13-11-12.png){width=70%}
 
-Como vemos en la ejecución cuando ponemos ls no se ejecuta nada por que es necesario poner `/bin/` delante del comando que quermos ejecutar para que pueda ejecutar los ejecutables que tenemos en `/bin/`.
+Como vemos en la ejecución, cuando ponemos ls no se ejecuta nada por que es necesario poner `/bin/` delante del comando que quermos ejecutar para que pueda ejecutar los ejecutables que tenemos en `/bin/`.
 
 ```{c, eval=FALSE}
 #include <stdio.h> // Para poder imprimir por pantalla
@@ -705,7 +714,7 @@ int main()
 
 ![Terminal](imagenes/Captura desde 2024-04-17 13-19-18.png){width=90%}
 
-Una vez visto que funciona el programa podemos decir que tenemos la primera versión de nuestro programa realizado la cual sería la version 0.0.1
+Una vez visto que funciona el programa, podemos decir que tenemos la primera versión de nuestro programa realizado, la cual sería la version 0.0.1:
 
 ## Version 0.0.1
 
@@ -793,7 +802,7 @@ int main()
 
 ## Añadiendo experiencia de usuario
 
-En esta parte vamos a actualizar el código para poder mejorar la experiencia de usuario donde tenemos que controlar si al ejecutar el código este falla en el cursor aparecerá estos caracteres ":(", si se ejecuta correctamente entonces aparecería ":)". Este sería el codigo que le añadimos a la versión 0.0.1
+En esta parte, vamos a actualizar el código para poder mejorar la experiencia de usuario. Tenemos que controlar; si al ejecutar el código este falla, en el cursor aparecerá estos caracteres ":(", si se ejecuta correctamente, entonces aparecería ":)". Este sería el codigo que le añadimos a la versión 0.0.1:
 
 - Código
 
@@ -825,14 +834,434 @@ En este caso controlamos la salida que produce el hijo en caso de que este devul
 
 ![Terminal](imagenes/Captura desde 2024-04-17 15-15-21.png){width=100%}
 
+
+## Versión 0.0.2
+
+Nos damos cuenta de que el problema anterior se puede solucionar fácil cambiando execve() por execvp(). De esta manera se nos queda un código más compacto y sencillo:
+
+```{c, eval=FALSE}
+#include <stdio.h> // Para poder imprimir por pantalla
+#include <stdlib.h> // Para poder usar getline()
+#include <string.h> // Para poder usar strcmp() 
+#include <sys/types.h> // para poder usar pid_t
+#include <unistd.h> // Necesario para declarar el fork()
+#include <sys/wait.h> // Para poder usar el wait()
+
+#define MAX_ARGUMENTS 40
+
+int SonIguales(const char *str1, const char *str2) {
+	return strcmp(str1, str2) == 0;
+}
+
+int main()
+{
+	// Tamaño inicial del buffer
+	size_t n = 10;
+	char *buf = malloc(sizeof(char) * n);
+	// Creamos una variable para controlar la salida del bucle
+	int seguir_ejecutandose = 1;
+	// Arreglo de argumentos
+	char *args[MAX_ARGUMENTS];
+	char *cara = ":)";
+	// Creamos el estado que devolvera el hijo 
+	int status;
+
+	//Bucle principal del programa
+	while(seguir_ejecutandose) {
+		printf("%s", cara);
+		getline(&buf, &n, stdin);
+
+		// Cambiando el \n por un \0
+		if((strlen(buf) > 0) && (buf[strlen(buf) - 1] == '\n')) {
+			buf[strlen(buf) - 1] = '\0';
+		}
+
+		// Salir del bucle si se introduce exit o exit()
+		if(SonIguales(buf, "exit") || SonIguales(buf, "exit()")) {
+			// Ponemos el valor de seguir_ejecutandose a 0
+			seguir_ejecutandose = 0;
+			continue;
+		}
+
+		// Comprobar que se introduce clear por terminal
+		if(SonIguales(buf, "clear")) {
+			printf("\033[2J\033[H");
+			continue;
+		}
+
+		// Creamos un proceso hijo
+		pid_t pid;
+
+		pid = fork();
+
+		if (pid == -1) {
+			// Error al crear el hijo
+			perror("Error al crearse el proceso hijo");
+			exit(1);
+		} else if (pid == 0) {
+			// Proceso hijo
+			printf("PID del proceso hijo %d\n", getpid());
+			printf("PID del proceso padre es %d\n", getppid());
+
+			// Dividimos la entrada del usuario por tokens
+			char *token = strtok(buf, " ");
+			int i = 0;
+			while(token != NULL) {
+				args[i++] = token;
+				token = strtok(NULL, " ");
+			}
+			args[i] = NULL;
+			execvp(args[0], args);
+			exit(1); //Salir si execve falla
+		} else {
+			// Proceso padre
+			wait(&status); // Espera a que termine el hijo
+			if(WEXITSTATUS(status) == 1) {
+				cara = ":(";
+			} else {
+				cara = ":)";
+			}
+		}
+	}
+	free(buf);
+	return 0;
+}
+
+```
+
+- Ejecución 
+
+![Terminal](imagenes/WhatsApp Image 2024-04-24 at 19.51.38.jpeg){width=70%}
+
+
 # Requisitos opcionales
 
-## Cálculo del tiempo que tarda en ejecutarse el hijo
+## Cálculo del tiempo que tarda en ejecutarse el hijo y versión 0.0.3
+
+Este apartado lo elaboraremos de tres maneras distintas
+
+- La función times:
+
+```{c, eval=FALSE}
+#include <stdio.h> // Para poder imprimir por pantalla
+#include <stdlib.h> // Para poder usar getline()
+#include <string.h> // Para poder usar strcmp() 
+#include <sys/types.h> // para poder usar pid_t
+#include <unistd.h> // Necesario para declarar el fork()
+#include <sys/wait.h> // Para poder usar el wait()
+#include <time.h> //Para time y difftime
+
+
+#define MAX_ARGUMENTS 40
+
+int SonIguales(const char *str1, const char *str2) {
+	return strcmp(str1, str2) == 0;
+}
+
+int main()
+{
+	// Tamaño inicial del buffer
+	size_t n = 10;
+	char *buf = malloc(sizeof(char) * n);
+	// Creamos una variable para controlar la salida del bucle
+	int seguir_ejecutandose = 1;
+	// Arreglo de argumentos
+	char *args[MAX_ARGUMENTS];
+	char *cara = ":)";
+	// Creamos el estado que devolvera el hijo 
+	int status;
+	// Variables para medir el tiempo en segundos del proceso hijo
+    time_t start, end;
+
+	//Bucle principal del programa
+	while(seguir_ejecutandose) {
+		printf("%s", cara);
+		getline(&buf, &n, stdin); //Para guardar la línea de entrada en el buffer
+
+		// Cambiando el \n por un \0
+		if((strlen(buf) > 0) && (buf[strlen(buf) - 1] == '\n')) {
+			buf[strlen(buf) - 1] = '\0';
+		}
+
+		// Salir del bucle si se introduce exit o exit()
+		 //compara las cadenas de caracteres "buf" con "exit" o "exit()"
+		if(SonIguales(buf, "exit") || SonIguales(buf, "exit()")) {
+			// Ponemos el valor de seguir_ejecutandose a 0
+			seguir_ejecutandose = 0;
+			continue;
+		}
+
+		// Compara las cadenas de caracteres "buf" con "exit" o "exit()"
+		if(SonIguales(buf, "clear")) { 
+			printf("\033[2J\033[H"); //para limpiar la pantalla de la terminal
+			continue;
+		}
+
+		// Creamos un proceso hijo
+		pid_t pid;
+
+		start = time(NULL); // Medir tiempo de inicio del proceso hijo
+		pid = fork();
+		// Creamos el sleep para ver si funciona el tiempo de ejecución del proceso hijo
+		//sleep(5);
+		if (pid == -1) {
+			// Error al crear el hijo
+			perror("Error al crearse el proceso hijo");
+			exit(1);
+		} else if (pid == 0) {
+			// Proceso hijo
+			printf("PID del proceso hijo %d\n", getpid());
+			printf("PID del proceso padre es %d\n", getppid());
+
+			// Dividimos la entrada del usuario por tokens
+			char *token = strtok(buf, " ");
+			int i = 0;
+			while(token != NULL) {
+				args[i++] = token;
+				token = strtok(NULL, " ");
+			}
+			args[i] = NULL;
+			
+			execvp(args[0], args);
+			exit(1); //Salir si execve falla
+		} else {
+			// Proceso padre
+			wait(&status); // Espera a que termine el hijo
+			end = time(NULL); // Medir tiempo de fin del proceso hijo
+			if(WEXITSTATUS(status) == 1) {
+				cara = ":(";
+			} else {
+				cara = ":)";
+			}
+			// Calcular y mostrar el tiempo de ejecución del proceso hijo
+            double tiempo = difftime(end, start);
+            printf("El proceso hijo tardó %f segundos en ejecutarse.\n", tiempo);
+		}
+	}
+	free(buf);
+	return 0;
+}
+
+```
+
+Se obtiene el tiempo justo antes de crear el proceso hijo (start), se obtiene otro tiempo justo después de que el hijo termina (end), y la diferencia entre estos tiempos (difftime(end, start)) da el tiempo de ejecución del proceso hijo
+
+- Ejecución
+
+![Terminal](imagenes/WhatsApp Image 2024-04-24 at 19.51.38 (1).jpeg){width=100%}
+
+- La función getrusage:
+
+```{c, eval=FALSE}
+#include <stdio.h> // Para poder imprimir por pantalla
+#include <stdlib.h> // Para poder usar getline()
+#include <string.h> // Para poder usar strcmp() 
+#include <sys/types.h> // para poder usar pid_t
+#include <unistd.h> // Necesario para declarar el fork()
+#include <sys/wait.h> // Para poder usar el wait()
+#include <sys/time.h> // Para poder usar getrusage()
+#include <sys/resource.h> // Para poder usar RUSAGE_SELF y RUSAGE_CHILDREN
+
+#define MAX_ARGUMENTS 40
+
+int SonIguales(const char *str1, const char *str2) {
+	return strcmp(str1, str2) == 0;
+}
+
+int main()
+{
+	// Tamaño inicial del buffer
+	size_t n = 10;
+	char *buf = malloc(sizeof(char) * n);
+	// Creamos una variable para controlar la salida del bucle
+	int seguir_ejecutandose = 1;
+	// Arreglo de argumentos
+	char *args[MAX_ARGUMENTS];
+	char *cara = ":)";
+	// Creamos el estado que devolvera el hijo 
+	int status;
+
+	//Bucle principal del programa
+	while(seguir_ejecutandose) {
+		printf("%s", cara);
+		getline(&buf, &n, stdin);
+
+		// Cambiando el \n por un \0
+		if((strlen(buf) > 0) && (buf[strlen(buf) - 1] == '\n')) {
+			buf[strlen(buf) - 1] = '\0';
+		}
+
+		// Salir del bucle si se introduce exit o exit()
+		if(SonIguales(buf, "exit") || SonIguales(buf, "exit()")) {
+			// Ponemos el valor de seguir_ejecutandose a 0
+			seguir_ejecutandose = 0;
+			continue;
+		}
+
+		// Comprobar que se introduce clear por terminal
+		if(SonIguales(buf, "clear")) {
+			printf("\033[2J\033[H");
+			continue;
+		}
+
+		// Creamos un proceso hijo
+		pid_t pid;
+
+		struct rusage usage;
+
+		pid = fork();
+
+		if (pid == -1) {
+			// Error al crear el hijo
+			perror("Error al crearse el proceso hijo");
+			exit(1);
+		} else if (pid == 0) {
+			// Proceso hijo
+			printf("PID del proceso hijo %d\n", getpid());
+			printf("PID del proceso padre es %d\n", getppid());
+
+			// Dividimos la entrada del usuario por tokens
+			char *token = strtok(buf, " ");
+			int i = 0;
+			while(token != NULL) {
+				args[i++] = token;
+				token = strtok(NULL, " ");
+			}
+			args[i] = NULL;
+			getrusage(RUSAGE_SELF, &usage);
+			execvp(args[0], args);
+			exit(1); //Salir si execve falla
+		} else {
+			// Proceso padre
+			wait(&status); // Espera a que termine el hijo
+			getrusage(RUSAGE_CHILDREN, &usage);
+			// Calcula el tiempo de ejecución del proceso hijo
+			double time_used = usage.ru_utime.tv_sec + usage.ru_utime.tv_usec / 1000000.0;
+			printf("Tiempo de ejecución del proceso hijo: %f segundos\n", time_used);
+			if(WEXITSTATUS(status) == 1) {
+				cara = ":(";
+			} else {
+				cara = ":)";
+			}
+		}
+	}
+	free(buf);
+	return 0;
+}
+```
+
+En esta función, el struct rusage se usa para obtener información detallada sobre el uso de recursos por parte del proceso hijo. En este caso específico, se utiliza para obtener el tiempo de CPU que el proceso hijo ha utilizado en modo de usuario (ru_utime), lo cual nos da una idea del tiempo que ha tardado en ejecutarse el comando específico ingresado por el usuario.
+
+- Ejecución
+
+![Terminal](imagenes/WhatsApp Image 2024-04-24 at 19.51.38 (2).jpeg){width=90%}
+
+- Función timespec_get
+
+```{c, eval=FALSE}
+#include <time.h> // Para usar timespec_get
+#include <stdio.h> // Para poder imprimir por pantalla
+#include <stdlib.h> // Para poder usar getline()
+#include <string.h> // Para poder usar strcmp() 
+#include <sys/types.h> // para poder usar pid_t
+#include <unistd.h> // Necesario para declarar el fork()
+#include <sys/wait.h> // Para poder usar el wait()
+
+#define MAX_ARGUMENTS 40
+
+int SonIguales(const char *str1, const char *str2) {
+	return strcmp(str1, str2) == 0;
+}
+
+int main()
+{
+
+	// Tamaño inicial del buffer
+	size_t n = 10;
+	char *buf = malloc(sizeof(char) * n);
+	// Creamos una variable para controlar la salida del bucle
+	int seguir_ejecutandose = 1;
+	// Arreglo de argumentos
+	char *args[MAX_ARGUMENTS];
+	char *cara = ":)";
+	// Creamos el estado que devolvera el hijo 
+	int status;
+
+	//Bucle principal del programa
+	while(seguir_ejecutandose) {
+		printf("%s", cara);
+		getline(&buf, &n, stdin);
+
+		// Cambiando el \n por un \0
+		if((strlen(buf) > 0) && (buf[strlen(buf) - 1] == '\n')) {
+			buf[strlen(buf) - 1] = '\0';
+		}
+
+		// Salir del bucle si se introduce exit o exit()
+		if(SonIguales(buf, "exit") || SonIguales(buf, "exit()")) {
+			// Ponemos el valor de seguir_ejecutandose a 0
+			seguir_ejecutandose = 0;
+			continue;
+		}
+
+		// Comprobar que se introduce clear por terminal
+		if(SonIguales(buf, "clear")) {
+			printf("\033[2J\033[H");
+			continue;
+		}
+
+		// Creamos un proceso hijo
+		pid_t pid;
+		
+		// Obtenemos la marca de tiempo de inicio
+		struct timespec begin;
+		timespec_get(&begin, TIME_UTC);
+
+		pid = fork();
+
+		if (pid == -1) {
+			// Error al crear el hijo
+			perror("Error al crearse el proceso hijo");
+			exit(1);
+		} else if (pid == 0) {
+			// Proceso hijo
+			printf("PID del proceso hijo %d\n", getpid());
+			printf("PID del proceso padre es %d\n", getppid());
+
+			// Dividimos la entrada del usuario por tokens
+			char *token = strtok(buf, " ");
+			int i = 0;
+			while(token != NULL) {
+				args[i++] = token;
+				token = strtok(NULL, " ");
+			}
+			args[i] = NULL;
+			execvp(args[0], args);
+			exit(1); //Salir si execve falla
+		} else {
+			// Proceso padre
+			wait(&status); // Espera a que termine el hijo
+			// Obtenemos la marca de tiempo final
+			struct timespec end;
+			timespec_get(&end, TIME_UTC);
+
+			// Calcula el tiempo de ejecución del proceso hijo
+			double time_spent = (end.tv_sec - begin.tv_sec) + 
+			  (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
+			printf("Tiempo de ejecución del proceso hijo: %f segundos\n", time_spent);
+			if(WEXITSTATUS(status) == 1) {
+				cara = ":(";
+			} else {
+				cara = ":)";
+			}
+		}
+	}
+	free(buf);
+	return 0;
+}
+```
+
+Para utilizar la función `getrusage()`, solo necesitamos registrar el tiempo de inicio y el tiempo de finalización del cálculo. Esto se logra restando el tiempo final del tiempo inicial. Esta operación nos proporcionará el tiempo transcurrido desde que el proceso hijo comenzó a ejecutarse. Luego, este tiempo se muestra en la pantalla. Este será  nuestra versión 0.0.3 del código.
 
 ## Cambio del directorio con cd
-
-## Ejecución asincrona con &
-
-
-
 

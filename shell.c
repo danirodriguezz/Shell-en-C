@@ -1,11 +1,10 @@
+#include <time.h> // Para usar timespec_get
 #include <stdio.h> // Para poder imprimir por pantalla
 #include <stdlib.h> // Para poder usar getline()
 #include <string.h> // Para poder usar strcmp() 
 #include <sys/types.h> // para poder usar pid_t
 #include <unistd.h> // Necesario para declarar el fork()
 #include <sys/wait.h> // Para poder usar el wait()
-#include <time.h> //Para time y difftime
-
 
 #define MAX_ARGUMENTS 40
 
@@ -15,6 +14,7 @@ int SonIguales(const char *str1, const char *str2) {
 
 int main()
 {
+
 	// Tamaño inicial del buffer
 	size_t n = 10;
 	char *buf = malloc(sizeof(char) * n);
@@ -25,13 +25,11 @@ int main()
 	char *cara = ":)";
 	// Creamos el estado que devolvera el hijo 
 	int status;
-	// Variables para medir el tiempo en segundos del proceso hijo
-    time_t start, end;
 
 	//Bucle principal del programa
 	while(seguir_ejecutandose) {
 		printf("%s", cara);
-		getline(&buf, &n, stdin); //Para guardar la línea de entrada en el buffer
+		getline(&buf, &n, stdin);
 
 		// Cambiando el \n por un \0
 		if((strlen(buf) > 0) && (buf[strlen(buf) - 1] == '\n')) {
@@ -39,24 +37,27 @@ int main()
 		}
 
 		// Salir del bucle si se introduce exit o exit()
-		if(SonIguales(buf, "exit") || SonIguales(buf, "exit()")) { //compara las cadenas de caracteres "buf" con "exit" o "exit()"
+		if(SonIguales(buf, "exit") || SonIguales(buf, "exit()")) {
 			// Ponemos el valor de seguir_ejecutandose a 0
 			seguir_ejecutandose = 0;
 			continue;
 		}
 
 		// Comprobar que se introduce clear por terminal
-		if(SonIguales(buf, "clear")) { //compara las cadenas de caracteres "buf" con "exit" o "exit()"
-			printf("\033[2J\033[H"); //para limpiar la pantalla de la terminal
+		if(SonIguales(buf, "clear")) {
+			printf("\033[2J\033[H");
 			continue;
 		}
 
 		// Creamos un proceso hijo
 		pid_t pid;
+		
+		// Obtenemos la marca de tiempo de inicio
+		struct timespec begin;
+		timespec_get(&begin, TIME_UTC);
 
-		start = time(NULL); // Medir tiempo de inicio del proceso hijo
 		pid = fork();
-		//sleep(5); // Creamos el sleep para ver si funciona el tiempo de ejecución del proceso hijo
+
 		if (pid == -1) {
 			// Error al crear el hijo
 			perror("Error al crearse el proceso hijo");
@@ -74,21 +75,23 @@ int main()
 				token = strtok(NULL, " ");
 			}
 			args[i] = NULL;
-			
 			execvp(args[0], args);
 			exit(1); //Salir si execve falla
 		} else {
 			// Proceso padre
 			wait(&status); // Espera a que termine el hijo
-			end = time(NULL); // Medir tiempo de fin del proceso hijo
+			// Obtenemos la marca de tiempo final
+			struct timespec end;
+			timespec_get(&end, TIME_UTC);
+
+			// Calcula el tiempo de ejecución del proceso hijo
+			double time_spent = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1000000000.0;
+			printf("Tiempo de ejecución del proceso hijo: %f segundos\n", time_spent);
 			if(WEXITSTATUS(status) == 1) {
 				cara = ":(";
 			} else {
 				cara = ":)";
 			}
-			// Calcular y mostrar el tiempo de ejecución del proceso hijo
-            double tiempo = difftime(end, start);
-            printf("El proceso hijo tardó %f segundos en ejecutarse.\n", tiempo);
 		}
 	}
 	free(buf);
